@@ -35,6 +35,11 @@ export class DeployController {
     @Headers('X-Gitlab-Token') token: string,
   ) {
 
+    consola.info('开始部署', body.project.path_with_namespace)
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    consola.info('部署完成', body.project.path_with_namespace)
+    return 'Deployed!'
+
     // 校验 Secret token 是否正确
     if (token !== '123456') return new HttpException({
       code: 401,

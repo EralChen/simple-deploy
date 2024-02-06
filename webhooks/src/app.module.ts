@@ -7,7 +7,7 @@ import { DeployModule } from './deploy/deploy.module'
 
 @Module({
   imports: [
-    DeployModule
+    DeployModule,
   ],
   controllers: [AppController],
   providers: [AppService],

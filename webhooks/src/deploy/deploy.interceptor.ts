@@ -1,38 +1,55 @@
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
-import { DEPLOY_LOCK_KEY } from './deploy.decorator';
-import { Observable, lastValueFrom } from 'rxjs';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common'
+import { DEPLOY_LOCK_KEY } from './deploy.decorator'
+import { lastValueFrom } from 'rxjs'
 
 @Injectable()
 export class LockInterceptor implements NestInterceptor {
-  private locks: Map<string, boolean> = new Map();
+  private locksQueues: Map<string, Promise<any>[]> = new Map()
 
-  async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    console.log('context:', context)
-    
+  async intercept (
+    context: ExecutionContext, 
+    next: CallHandler,
+  ) {
+
+
     const needLocked = Reflect.getMetadata(
       DEPLOY_LOCK_KEY, 
-      context.getHandler()
-    );
+      context.getHandler(),
+    )
 
     if (needLocked) {
 
-      const lockKey = context.getHandler().name;
+      const lockKey = context.getHandler().name
 
-      if (this.locks.has(lockKey) && this.locks.get(lockKey)) {
-        throw new Error('Already locked. Try again later.');
-      }
+      
+      // 如果有队列就等待之前的任务完成，然后再执行当前任务
+      let queue = this.locksQueues.get(lockKey)
 
-      this.locks.set(lockKey, true);
+      queue ?? (
+        this.locksQueues.set(lockKey, []),
+        queue = this.locksQueues.get(lockKey)
+      )
+      
 
 
-      const result = await lastValueFrom(next.handle());
+      const taskPromise = Promise.allSettled([...queue])
+        .then(() => {
+          const curentTask = lastValueFrom(next.handle())
 
-      this.locks.set(lockKey, false);
+          queue.push(curentTask)
 
-      return result;
-    
+          return curentTask
+
+        }).then((res) => {
+          // 任务完成后，从队列中移除当前任务
+          const currentTaskIndex = queue.indexOf(taskPromise)
+          queue.splice(currentTaskIndex, 1)
+          return res
+        })
+
+      return taskPromise
     } else {
-      return next.handle();
+      return next.handle()
     }
   }
 
