@@ -1,0 +1,23 @@
+{
+	"devDependencies": {
+		"@lib-env/eslint-config": "workspace:*",
+		"@lib-env/path": "workspace:*",
+		"@lib-env/shared": "workspace:*",
+		"@types/node": "^18.0.4",
+		"consola": "^3.2.3",
+		"eslint": "^8.56.0",
+		"eslint-define-config": "^2.1.0",
+		"eslint-plugin-vue": "^9.2.0",
+		"unbuild": "^2.0.0"
+	},
+	"dependencies": {
+		"@vunk/core": "0.0.0-alpha.111"
+	},
+	"scripts": {
+		"start": "pnpm run -C webhooks start",
+		"stub": "pnpm run -r --parallel stub",
+		"lint": "eslint --fix app/**/*.{ts,vue}",
+		"postinstall": "pnpm stub",
+		"rm:nm": "find . -name \"node_modules\" -type d -prune -exec rm -rf '{}' +"
+	}
+}
