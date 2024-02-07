@@ -47,6 +47,7 @@ export class LockInterceptor implements NestInterceptor {
           return res
         })
 
+
       return taskPromise
     } else {
       return next.handle()
