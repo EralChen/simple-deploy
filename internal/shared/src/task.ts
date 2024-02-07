@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import type { AnyFunc } from '@vunk/core'
 
+
 export const taskWithName = <T extends AnyFunc>(
   displayName: string,
   fn:T,
@@ -23,8 +24,10 @@ export const run = async (
       cwd,
       stdio: 'inherit',
       shell: true,
+      
     })
 
     app.on('close', resolve)
   })
 }
+

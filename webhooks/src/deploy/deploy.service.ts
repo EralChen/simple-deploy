@@ -66,7 +66,9 @@ export class DeployService {
    * 更新依赖
    */
   async uDependencies (codeDir: string) {
-    // 下载/更新 pnpm 
+
+    // 下载/更新 pnpm  
+    // [TODO] 更新全局 pnpm
     await run('npm i -g pnpm')
 
     // 安装依赖
@@ -102,14 +104,14 @@ export class DeployService {
       const pathDist = deployConfig.path?.dist ?? './dist'
 
       // prod: deployConfig.path?.html ??
-      const pathHtml = path.resolve(workRoot, 'nginx/html', body.project.path_with_namespace)
+      const pathHtml = deployConfig.path?.html ?? path.resolve(workRoot, 'nginx/html', body.project.path_with_namespace)
 
       return {
         scripts,
 
         path: {
           // 从 dist 中取出所有文件
-          dist: path.resolve(workRoot, pathDist),
+          dist: path.resolve(codeDir, pathDist),
 
           // 将取出的文件放入 nginx 的指定目录下
           html: pathHtml,
@@ -143,7 +145,7 @@ export class DeployService {
       await fs.promises.rename(
         deployInfo.path.html,
         // 年月日
-        deployInfo.path.html + '.' + new Date().toISOString().slice(0, 10).replace(/-/g, ''),
+        deployInfo.path.html + '.' + new Date().toISOString(),
       )
     }
   
