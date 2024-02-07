@@ -69,7 +69,7 @@ export class DeployService {
 
     // 下载/更新 pnpm  
     // [TODO] 更新全局 pnpm
-    await run('npm i -g pnpm')
+    // await run('npm i -g pnpm')
 
     // 安装依赖
     await run('pnpm i', codeDir)
