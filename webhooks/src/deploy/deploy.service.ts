@@ -81,7 +81,6 @@ export class DeployService {
    */
   async rDeployConfigs (codeDir: string, body: GitlabPushEvent) {
 
-    // const deployInfos = (function () {
     let deployList = [{}] as DeployConfig[]
     if (fs.existsSync(
       path.resolve(codeDir, 'deploy.config.json'),

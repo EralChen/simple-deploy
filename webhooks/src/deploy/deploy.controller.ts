@@ -82,4 +82,39 @@ export class DeployController {
 
   }
 
+  @Post('default')
+  @DeployLock()
+  async deployDefault (
+    @Body() body: GitlabPushEvent,
+    @Headers('X-Gitlab-Token') token: string,
+  ) {
+    // 校验 Secret token 是否正确
+    if (token !== '123456') return new HttpException({
+      code: 401,
+      message: 'Unauthorized',
+    }, 401)
+
+    consola.info('deploy default', 'cuCode')
+    const { dir: codeDir } = await this.deployService.cuCode(body)
+
+    
+    consola.info('deploy default', 'uDependencies')
+    await this.deployService.uDependencies(codeDir)
+
+
+    const deployConfigs = await this.deployService.rDeployConfigs(codeDir, body)
+
+
+    consola.info('deploy default', 'deploy')
+    for (const deployConfig of deployConfigs) {
+      await this.deployService.deploy(codeDir, deployConfig)
+    }
+
+    return {
+      code: 200,
+      message: 'ok',
+    }
+
+  }
+
 }

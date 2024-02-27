@@ -4,13 +4,16 @@ import type { AnyFunc } from '@vunk/core'
 
 export const taskWithName = <T extends AnyFunc>(
   displayName: string,
-  fn:T,
+  fn: T,
 ):T => {
   return Object.assign(fn, {
     displayName,
   })
 }
 
+/**
+ * 在应用程序中运行 cmd 命令
+ */
 export const run = async (
   script: string, 
   cwd?: string,
